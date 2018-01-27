@@ -1,6 +1,9 @@
 package ru.javaops.masterjava.upload;
 
 import org.thymeleaf.context.WebContext;
+import ru.javaops.masterjava.persist.DBIProvider;
+import ru.javaops.masterjava.persist.dao.AbstractDao;
+import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 
 import javax.servlet.ServletException;
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.DriverManager;
 import java.util.List;
 
 import static ru.javaops.masterjava.common.web.ThymeleafListener.engine;
@@ -47,5 +51,38 @@ public class UploadServlet extends HttpServlet {
             webContext.setVariable("exception", e);
             engine.process("exception", webContext, resp.getWriter());
         }
+
+
+        DBIProvider.init(() -> {
+            try {
+                Class.forName("org.postgresql.Driver");
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException("PostgreSQL driver not found", e);
+            }
+            return DriverManager.getConnection("jdbc:postgresql://localhost:5432/masterjava", "user", "password");
+        });
+
+ /*       <DAO extends AbstractDao> dao = DBIProvider.getDao(UserDao.class);
+
+        DBI dbi = new DBI("jdbc:h2:mem:test");
+        Handle h = dbi.open();
+
+        BatchExample b = h.attach(BatchExample.class);
+        b.createSomethingTable();
+
+        List<Integer> ids = asList(1, 2, 3, 4, 5);
+        Iterator<String> first_names = asList("Tip", "Jane", "Brian", "Keith", "Eric").iterator();
+
+        b.insertFamily(ids, first_names, "McCallister");
+
+        assertThat(b.findNameById(1), equalTo("Tip McCallister"));
+        assertThat(b.findNameById(2), equalTo("Jane McCallister"));
+        assertThat(b.findNameById(3), equalTo("Brian McCallister"));
+        assertThat(b.findNameById(4), equalTo("Keith McCallister"));
+        assertThat(b.findNameById(5), equalTo("Eric McCallister"));
+
+        h.close();*/
     }
+
+
 }
