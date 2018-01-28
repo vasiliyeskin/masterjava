@@ -1,6 +1,4 @@
-package ru.javaops.masterjava.dao;
-import ru.javaops.masterjava.dao.AbstractDaoUpload;
-import ru.javaops.masterjava.persist.dao.UserDao;
+package ru.javaops.masterjava.persist.dao;
 
 public class UserDaoUpload extends AbstractDaoUpload<UserDao> {
 

@@ -1,4 +1,4 @@
-package ru.javaops.masterjava.dao;
+package ru.javaops.masterjava.persist.dao;
 
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.AbstractDao;

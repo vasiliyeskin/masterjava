@@ -1,7 +1,7 @@
 package ru.javaops.masterjava.upload;
 
 import org.thymeleaf.context.WebContext;
-import ru.javaops.masterjava.dao.UserDaoUpload;
+import ru.javaops.masterjava.persist.dao.UserDaoUpload;
 import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 

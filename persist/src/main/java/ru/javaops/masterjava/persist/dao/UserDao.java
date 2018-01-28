@@ -11,8 +11,6 @@ import java.util.List;
 @RegisterMapperFactory({EntityMapperFactory.class})
 public abstract class UserDao implements AbstractDao {
 
-    public final Integer chunk = 5;
-
     public User insert(User user) {
         if (user.isNew()) {
             int id = insertGeneratedId(user);
@@ -28,12 +26,12 @@ public abstract class UserDao implements AbstractDao {
         return users;
     }
 
-    @SqlBatch("INSERT INTO users (full_name, email, flag) VALUES (:fullName, :email, CAST(:flag AS user_flag)) ")
+    @SqlBatch("INSERT INTO users (full_name, email, flag) VALUES (:fullName, :email, CAST(:flag AS user_flag)) ON CONFLICT (email) DO NOTHING")
     @GetGeneratedKeys
-    @BatchChunkSize()
-    protected abstract void insertListGeneratedId(List<User> users);
+    @BatchChunkSize(5)
+    protected abstract int[] insertListGeneratedId(@BindBean List<User> users);
 
-    @SqlUpdate("INSERT INTO users (full_name, email, flag) VALUES (:fullName, :email, CAST(:flag AS user_flag)) ")
+    @SqlUpdate("INSERT INTO users (full_name, email, flag) VALUES (:fullName, :email, CAST(:flag AS user_flag)) ON CONFLICT (email) DO NOTHING")
     @GetGeneratedKeys
     abstract int insertGeneratedId(@BindBean User user);
 
