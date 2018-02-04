@@ -4,13 +4,11 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class City extends RefEntity {
-    public City(String ref, String name) {
-        super(ref);
-        this.name = name;
-    }
+public class Project extends BaseEntity {
 
     @NonNull private String name;
+    @NonNull private String description;
 }
