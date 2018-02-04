@@ -1,32 +1,36 @@
 package ru.javaops.masterjava.persist;
 
-import com.google.common.collect.ImmutableList;
-import ru.javaops.masterjava.persist.dao.CityDAO;
+import com.google.common.collect.ImmutableMap;
+import ru.javaops.masterjava.persist.dao.CityDao;
 import ru.javaops.masterjava.persist.model.City;
 
-import java.util.List;
+import java.util.Map;
 
 public class CityTestData {
-    public static City mos;
-    public static City spb;
-    public static City nn;
-    public static City kost;
-    public static List<City> FIRST3_CITIES;
+    public static City KIEV;
+    public static City MINSK;
+    public static City MOSCOW;
+    public static City SPB;
+
+    public static Map<String, City> CITIES;
 
     public static void init() {
-        mos = new City("mos", "mos");
-        spb = new City("spb","spb");
-        nn  = new City("nn", "nn");
-        kost = new City("kost","kost");
-        FIRST3_CITIES = ImmutableList.of(mos, spb, nn);
+        KIEV = new City("kiv", "Киев");
+        MINSK = new City("mnsk", "Минск");
+        MOSCOW = new City("mow", "Москва");
+        SPB = new City("spb", "Санкт-Петербург");
+        CITIES = ImmutableMap.of(
+                KIEV.getRef(), KIEV,
+                MINSK.getRef(), MINSK,
+                MOSCOW.getRef(), MOSCOW,
+                SPB.getRef(), SPB);
     }
 
     public static void setUp() {
-        CityDAO dao = DBIProvider.getDao(CityDAO.class);
+        CityDao dao = DBIProvider.getDao(CityDao.class);
         dao.clean();
         DBIProvider.getDBI().useTransaction((conn, status) -> {
-            FIRST3_CITIES.forEach(dao::insert);
-            dao.insert(kost);
+            CITIES.values().forEach(dao::insert);
         });
     }
 }

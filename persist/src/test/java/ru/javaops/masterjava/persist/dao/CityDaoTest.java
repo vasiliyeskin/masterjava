@@ -1,23 +1,21 @@
 package ru.javaops.masterjava.persist.dao;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.javaops.masterjava.persist.CityTestData;
 import ru.javaops.masterjava.persist.model.City;
 
+import java.util.Map;
 
-import static ru.javaops.masterjava.persist.CityTestData.FIRST3_CITIES;
+import static org.junit.Assert.assertEquals;
+import static ru.javaops.masterjava.persist.CityTestData.CITIES;
 
-import java.util.List;
+public class CityDaoTest extends AbstractDaoTest<CityDao> {
 
-public class CityDAOTest extends AbstractDaoTest<CityDAO> {
-
-    public CityDAOTest() {
-        super(CityDAO.class);
+    public CityDaoTest() {
+        super(CityDao.class);
     }
-
 
     @BeforeClass
     public static void init() throws Exception {
@@ -30,9 +28,9 @@ public class CityDAOTest extends AbstractDaoTest<CityDAO> {
     }
 
     @Test
-    public void getWithLimit() throws Exception {
-        List<City> cityList= dao.getWithLimit(3);
-        Assert.assertEquals(FIRST3_CITIES, cityList);
+    public void getAll() throws Exception {
+        final Map<String, City> cities = dao.getAsMap();
+        assertEquals(CITIES, cities);
+        System.out.println(cities.values());
     }
-
 }
