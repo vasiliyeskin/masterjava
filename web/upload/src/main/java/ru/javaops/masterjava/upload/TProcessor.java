@@ -1,8 +1,7 @@
 package ru.javaops.masterjava.upload;
 
 import ru.javaops.masterjava.persist.DBIProvider;
-import ru.javaops.masterjava.persist.dao.CityDAO;
-import ru.javaops.masterjava.persist.model.BaseEntity;
+import ru.javaops.masterjava.persist.dao.CityDao;
 import ru.javaops.masterjava.persist.model.City;
 import ru.javaops.masterjava.xml.schema.ObjectFactory;
 import ru.javaops.masterjava.xml.util.JaxbParser;
@@ -19,7 +18,7 @@ import java.util.List;
 public class TProcessor {
 
         private static final JaxbParser jaxbParser = new JaxbParser(ObjectFactory.class);
-        private static CityDAO cityDAO = DBIProvider.getDao(CityDAO.class);
+        private static CityDao cityDAO = DBIProvider.getDao(CityDao.class);
 
         public List<City> process(final InputStream is, int chunkSize) throws XMLStreamException, JAXBException {
             final StaxStreamProcessor processor = new StaxStreamProcessor(is);
@@ -31,7 +30,7 @@ public class TProcessor {
                 final City city = new City(xmlCity.getValue(), xmlCity.getValue());
                 cities.add(city);
             }
-            cityDAO.insertBatch(cities, 5);
+            cityDAO.insertBatch(cities);
             return cities;
         }
 
