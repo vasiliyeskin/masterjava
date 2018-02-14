@@ -1,10 +1,12 @@
 package ru.javaops.masterjava.service.mail;
 
+import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.mail.*;
+import ru.javaops.masterjava.config.Configs;
+import ru.javaops.masterjava.service.mail.dao.SentMailDao;
+import ru.javaops.masterjava.service.mail.model.SentMail;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 
@@ -13,43 +15,31 @@ public class MailSender {
     static void sendMail(List<Addressee> to, List<Addressee> cc, String subject, String body) {
         log.info("Send mail to \'" + to + "\' cc \'" + cc + "\' subject \'" + subject + (log.isDebugEnabled() ? "\nbody=" + body : ""));
 
+        SentMailDao sentMailDao = DBIProvider.getDao(SentMailDao.class);
+
+        Config mailconfig = Configs.getConfig("mail.conf","mail");
+
         try {
             Email email = new SimpleEmail();
-            email.setHostName("smtp.yandex.ru");
-            email.setSmtpPort(465);
-            email.setAuthenticator(new DefaultAuthenticator("username", "password"));
-            email.setSSLOnConnect(true);
-            email.setFrom("user@yandex.ru");
+            email.setHostName(mailconfig.getString("host"));
+            email.setSmtpPort(Integer.parseInt(mailconfig.getString("port")));
+            email.setAuthenticator(new DefaultAuthenticator(
+                    mailconfig.getString("username"),
+                    mailconfig.getString("password")));
+            email.setSSLOnConnect(new Boolean(mailconfig.getString("useSSL")));
+            email.setDebug(new Boolean(mailconfig.getString("debug")));
+            email.setFrom(
+                    mailconfig.getString("username"),
+                    mailconfig.getString("fromName"));
             email.setSubject("TestMail");
             email.setMsg("This is a test mail ... :-)");
-            email.addTo("foo@bar.com");
+            email.addTo("vasiliyeskin@yandex.ru");
             email.send();
+
+            sentMailDao.insert(new SentMail(mailconfig.getString("username"), mailconfig.getString("username"), true));
         } catch (EmailException e) {
-            e.printStackTrace();
+             e.printStackTrace();
         }
-
-
-
- /*       // Create the attachment
-        EmailAttachment attachment = new EmailAttachment();
-        attachment.setURL(new URL("http://www.apache.org/images/asf_logo_wide.gif"));
-        attachment.setDisposition(EmailAttachment.ATTACHMENT);
-        attachment.setDescription("Apache logo");
-        attachment.setName("Apache logo");
-
-        // Create the email message
-        MultiPartEmail email = new MultiPartEmail();
-        email.setHostName("mail.myserver.com");
-        email.addTo("jdoe@somewhere.org", "John Doe");
-        email.setFrom("me@apache.org", "Me");
-        email.setSubject("The logo");
-        email.setMsg("Here is Apache's logo");
-
-        // add the attachment
-        email.attach(attachment);
-
-        // send the email
-        email.send();*/
 
     }
 }
