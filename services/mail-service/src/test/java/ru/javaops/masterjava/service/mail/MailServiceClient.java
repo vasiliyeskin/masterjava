@@ -1,6 +1,7 @@
 package ru.javaops.masterjava.service.mail;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -15,8 +16,8 @@ public class MailServiceClient {
                 new QName("http://mail.javaops.ru/", "MailServiceImplService"));
 
         MailService mailService = service.getPort(MailService.class);
-        mailService.sendMail(ImmutableList.of(new Addressee("vasiliyeskin@yandex.ru", "Vasiliy")), null, "Subject", "Body");
-        mailService.sendMail(ImmutableList.of(
+        mailService.sendToGroup(ImmutableSet.of(new Addressee("vasiliyeskin@yandex.ru", "Vasiliy")), null, "Subject", "Body");
+        mailService.sendToGroup(ImmutableSet.of(
                 new Addressee("vasiliyeskin@yandex.ru", null),
                 new Addressee("Bad Email <bad_email.ru>")), null, "Subject", "Body");
     }
