@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import ru.javaops.masterjava.ExceptionType;
 import ru.javaops.masterjava.persist.DBIProvider;
@@ -52,5 +53,44 @@ public class MailSender {
         }
         log.info("Sent with state: " + state);
         return state;
+    }
+
+    public static String sendToGroupWithAttach(Set<Addressee> to, Set<Addressee> cc, String subject, String body, String attachedFile) throws WebStateException {
+        String state = MailResult.OK;
+        try {
+            val email = MailConfig.createHtmlEmail();
+            email.setSubject(subject);
+            email.setHtmlMsg(body);
+            for (Addressee addressee : to) {
+                email.addTo(addressee.getEmail(), addressee.getName());
+            }
+            for (Addressee addressee : cc) {
+                email.addCc(addressee.getEmail(), addressee.getName());
+            }
+
+            //  https://yandex.ru/blog/company/66296
+            email.setHeaders(ImmutableMap.of("List-Unsubscribe", "<mailto:vasiliyeskin@yandex.ru?subject=Unsubscribe&body=Unsubscribe>"));
+
+            EmailAttachment attachment = new EmailAttachment();
+            attachment.setPath(MailConfig.getTempDir() + attachedFile);
+            attachment.setDisposition(EmailAttachment.ATTACHMENT);
+            attachment.setDescription("Test attachment");
+            attachment.setName(attachedFile);
+
+            email.attach(attachment);
+            email.send();
+        } catch (EmailException e) {
+            log.error(e.getMessage(), e);
+            state = e.getMessage();
+        }
+        try {
+            MAIL_CASE_DAO.insert(MailCase.of(to, cc, subject, state));
+        } catch (Exception e) {
+            log.error("Mail history saving exception", e);
+            throw new WebStateException(e, ExceptionType.DATA_BASE);
+        }
+        log.info("Sent with state: " + state);
+        return state;
+
     }
 }

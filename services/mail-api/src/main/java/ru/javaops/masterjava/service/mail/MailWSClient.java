@@ -31,6 +31,13 @@ public class MailWSClient {
         return status;
     }
 
+    public static String sendToGroupWithAttach(final Set<Addressee> to, final Set<Addressee> cc, final String subject, final String body, final String attachedFile) throws WebStateException {
+        log.info("Send to group to '" + to + "' cc '" + cc + "' subject '" + subject + (log.isDebugEnabled() ? "\nbody=" + body : " with attached file=" + attachedFile + ""));
+        String status = WS_CLIENT.getPort().sendToGroupWithAttach(to, cc, subject, body, attachedFile);
+        log.info("Send to group with status: " + status);
+        return status;
+    }
+
     public static GroupResult sendBulk(final Set<Addressee> to, final String subject, final String body) throws WebStateException {
         log.info("Send bulk to '" + to + "' subject '" + subject + (log.isDebugEnabled() ? "\nbody=" + body : ""));
         GroupResult result = WS_CLIENT.getPort().sendBulk(to, subject, body);

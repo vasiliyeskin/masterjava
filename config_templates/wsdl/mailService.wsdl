@@ -15,6 +15,24 @@
             <xs:element name="sendToGroupResponse" type="tns:sendToGroupResponse"/>
             <xs:element name="sendBulk" type="tns:sendBulk"/>
             <xs:element name="sendBulkResponse" type="tns:sendBulkResponse"/>
+            <xs:element name="sendToGroupWithAttach" type="tns:sendToGroupWithAttach"/>
+            <xs:element name="sendToGroupWithAttachResponse" type="tns:sendToGroupWithAttachResponse"/>
+            <xs:complexType name="sendToGroupWithAttach">
+                <xs:sequence>
+                    <xs:element name="to" type="tns:addressee" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="cc" type="tns:addressee" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="subject" type="xs:string" minOccurs="0"/>
+                    <xs:element name="body" type="xs:string" minOccurs="0"/>
+                    <xs:element name="attachedFile" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="sendToGroupWithAttachResponse">
+                <xs:sequence>
+                    <xs:element name="return" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+
 
             <xs:complexType name="sendToGroup">
                 <xs:sequence>
@@ -76,6 +94,12 @@
     <message name="sendToGroupResponse">
         <part name="parameters" element="tns:sendToGroupResponse"/>
     </message>
+    <message name="sendToGroupWithAttach">
+        <part name="parameters" element="tns:sendToGroupWithAttach"/>
+    </message>
+    <message name="sendToGroupWithAttachResponse">
+        <part name="parameters" element="tns:sendToGroupWithAttachResponse"/>
+    </message>
     <message name="sendBulk">
         <part name="parameters" element="tns:sendBulk"/>
     </message>
@@ -94,6 +118,11 @@
             <fault wsam:Action="http://mail.javaops.ru/MailService/sendBulkMail/Fault/WebStateException"
                    message="tns:WebStateException" name="WebStateException" />
         </operation>
+        <operation name="sendToGroupWithAttach">
+            <input wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttachRequest" message="tns:sendToGroupWithAttach"/>
+            <output wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttachResponse" message="tns:sendToGroupWithAttachResponse"/>
+            <fault message="tns:WebStateException" name="WebStateException" wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttach/Fault/WebStateException"/>
+        </operation>
         <operation name="sendBulk">
             <input wsam:Action="http://mail.javaops.ru/MailService/sendBulkRequest"
                    message="tns:sendBulk"/>
@@ -106,6 +135,18 @@
     <binding name="MailServiceImplPortBinding" type="tns:MailService">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
         <operation name="sendToGroup">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WebStateException">
+                <soap:fault name="WebStateException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="sendToGroupWithAttach">
             <soap:operation soapAction=""/>
             <input>
                 <soap:body use="literal"/>

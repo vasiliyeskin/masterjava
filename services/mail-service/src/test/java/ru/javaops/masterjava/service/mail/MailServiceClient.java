@@ -19,6 +19,9 @@ public class MailServiceClient {
         String state = mailService.sendToGroup(ImmutableSet.of(new Addressee("vasiliyeskin@yandex.ru", null)), null, "Group mail subject", "Group mail body");
         System.out.println("Group mail state: " + state);
 
+        String stateAttarcedFile = mailService.sendToGroupWithAttach(ImmutableSet.of(new Addressee("vasiliyeskin@yandex.ru", null)), null, "Group mail subject", "Group mail body", "city.xml");
+        System.out.println("Group mail with attached file state: " + stateAttarcedFile);
+
         GroupResult groupResult = mailService.sendBulk(ImmutableSet.of(
                 new Addressee("vasiliyeskin@yandex.ru", null),
                 new Addressee("Bad Email <bad_email.ru>")), "Bulk mail subject", "Bulk mail body");

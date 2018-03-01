@@ -14,6 +14,11 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
+    public String sendToGroupWithAttach(Set<Addressee> to, Set<Addressee> cc, String subject, String body, String attachedFile) throws WebStateException {
+        return MailSender.sendToGroupWithAttach(to, cc, subject, body, attachedFile);
+    }
+
+    @Override
     public GroupResult sendBulk(Set<Addressee> to, String subject, String body) throws WebStateException {
         return MailServiceExecutor.sendBulk(to, subject, body);
     }
