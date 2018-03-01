@@ -6,12 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
+import org.jvnet.staxex.StreamingDataHandler;
 import ru.javaops.masterjava.ExceptionType;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.service.mail.persist.MailCase;
 import ru.javaops.masterjava.service.mail.persist.MailCaseDao;
 import ru.javaops.web.WebStateException;
 
+import javax.activation.DataHandler;
+import java.io.File;
 import java.util.Set;
 
 @Slf4j
@@ -91,6 +94,51 @@ public class MailSender {
         }
         log.info("Sent with state: " + state);
         return state;
+    }
 
+    public static String sendToGroupWithAttachment(Set<Addressee> to, Set<Addressee> cc, String subject, String body, String fileName, DataHandler data) throws WebStateException {
+        String state = MailResult.OK;
+        try {
+            val email = MailConfig.createHtmlEmail();
+            email.setSubject(subject);
+            email.setHtmlMsg(body);
+            for (Addressee addressee : to) {
+                email.addTo(addressee.getEmail(), addressee.getName());
+            }
+            for (Addressee addressee : cc) {
+                email.addCc(addressee.getEmail(), addressee.getName());
+            }
+
+            //  https://yandex.ru/blog/company/66296
+            email.setHeaders(ImmutableMap.of("List-Unsubscribe", "<mailto:vasiliyeskin@yandex.ru?subject=Unsubscribe&body=Unsubscribe>"));
+
+            StreamingDataHandler dh = (StreamingDataHandler) data;
+            File file = new File(fileName);
+            dh.moveTo(file);
+
+            EmailAttachment attachment = new EmailAttachment();
+            attachment.setPath(file.getPath());
+            attachment.setDisposition(EmailAttachment.ATTACHMENT);
+            attachment.setDescription("Test attachment");
+            attachment.setName(fileName);
+
+            email.attach(attachment);
+            email.send();
+            dh.close();
+        } catch (EmailException e) {
+            log.error(e.getMessage(), e);
+            state = e.getMessage();
+        }catch (Exception e) {
+            log.error(e.getMessage(), e);
+            state = e.getMessage();
+        }
+        try {
+            MAIL_CASE_DAO.insert(MailCase.of(to, cc, subject, state));
+        } catch (Exception e) {
+            log.error("Mail history saving exception", e);
+            throw new WebStateException(e, ExceptionType.DATA_BASE);
+        }
+        log.info("Sent with state: " + state);
+        return state;
     }
 }

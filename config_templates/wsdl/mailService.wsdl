@@ -6,7 +6,15 @@
              xmlns:common="http://common.javaops.ru/"
              xmlns="http://schemas.xmlsoap.org/wsdl/"
              targetNamespace="http://mail.javaops.ru/"
-             name="MailServiceImplService">
+             name="MailServiceImplService"
+             xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+             xmlns:wsp="http://www.w3.org/ns/ws-policy"
+             xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+
+>
+    <wsp:Policy wsu:Id="MailServiceImplPortBinding_MTOM_Policy">
+        <ns1:OptimizedMimeSerialization xmlns:ns1="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization" wsp:Optional="true"/>
+    </wsp:Policy>
     <types>
         <xs:schema targetNamespace="http://mail.javaops.ru/">
             <xs:import namespace="http://common.javaops.ru/" schemaLocation="common.xsd"/>
@@ -17,6 +25,8 @@
             <xs:element name="sendBulkResponse" type="tns:sendBulkResponse"/>
             <xs:element name="sendToGroupWithAttach" type="tns:sendToGroupWithAttach"/>
             <xs:element name="sendToGroupWithAttachResponse" type="tns:sendToGroupWithAttachResponse"/>
+            <xs:element name="sendToGroupWithAttachment" type="tns:sendToGroupWithAttachment"/>
+            <xs:element name="sendToGroupWithAttachmentResponse" type="tns:sendToGroupWithAttachmentResponse"/>
             <xs:complexType name="sendToGroupWithAttach">
                 <xs:sequence>
                     <xs:element name="to" type="tns:addressee" minOccurs="0" maxOccurs="unbounded"/>
@@ -86,6 +96,22 @@
             <xs:complexType name="sendMailResponse">
                 <xs:sequence/>
             </xs:complexType>
+
+            <xs:complexType name="sendToGroupWithAttachment">
+                <xs:sequence>
+                    <xs:element name="to" type="tns:addressee" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="cc" type="tns:addressee" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="subject" type="xs:string" minOccurs="0"/>
+                    <xs:element name="body" type="xs:string" minOccurs="0"/>
+                    <xs:element name="fileName" type="xs:string" minOccurs="0"/>
+                    <xs:element name="data" xmime:expectedContentTypes="application/octet-stream" type="xs:base64Binary" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="sendToGroupWithAttachmentResponse">
+                <xs:sequence>
+                    <xs:element name="return" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
         </xs:schema>
     </types>
     <message name="sendToGroup">
@@ -93,6 +119,12 @@
     </message>
     <message name="sendToGroupResponse">
         <part name="parameters" element="tns:sendToGroupResponse"/>
+    </message>
+    <message name="sendToGroupWithAttachment">
+        <part name="parameters" element="tns:sendToGroupWithAttachment"/>
+    </message>
+    <message name="sendToGroupWithAttachmentResponse">
+        <part name="parameters" element="tns:sendToGroupWithAttachmentResponse"/>
     </message>
     <message name="sendToGroupWithAttach">
         <part name="parameters" element="tns:sendToGroupWithAttach"/>
@@ -118,6 +150,11 @@
             <fault wsam:Action="http://mail.javaops.ru/MailService/sendBulkMail/Fault/WebStateException"
                    message="tns:WebStateException" name="WebStateException" />
         </operation>
+        <operation name="sendToGroupWithAttachment">
+            <input wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttachmentRequest" message="tns:sendToGroupWithAttachment"/>
+            <output wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttachmentResponse" message="tns:sendToGroupWithAttachmentResponse"/>
+            <fault message="tns:WebStateException" name="WebStateException" wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttachment/Fault/WebStateException"/>
+        </operation>
         <operation name="sendToGroupWithAttach">
             <input wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttachRequest" message="tns:sendToGroupWithAttach"/>
             <output wsam:Action="http://mail.javaops.ru/MailService/sendToGroupWithAttachResponse" message="tns:sendToGroupWithAttachResponse"/>
@@ -133,6 +170,7 @@
         </operation>
     </portType>
     <binding name="MailServiceImplPortBinding" type="tns:MailService">
+        <wsp:PolicyReference URI="#MailServiceImplPortBinding_MTOM_Policy"/>
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
         <operation name="sendToGroup">
             <soap:operation soapAction=""/>
@@ -147,6 +185,18 @@
             </fault>
         </operation>
         <operation name="sendToGroupWithAttach">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="WebStateException">
+                <soap:fault name="WebStateException" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="sendToGroupWithAttachment">
             <soap:operation soapAction=""/>
             <input>
                 <soap:body use="literal"/>
