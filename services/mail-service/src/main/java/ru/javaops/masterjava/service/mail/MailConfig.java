@@ -22,6 +22,7 @@ public class MailConfig {
     final private String username;
     final private Authenticator auth;
     final private String fromName;
+    final private String tempDir;
 
     private MailConfig(Config conf) {
         host = conf.getString("host");
@@ -32,6 +33,7 @@ public class MailConfig {
         useTLS = conf.getBoolean("useTLS");
         debug = conf.getBoolean("debug");
         fromName = conf.getString("fromName");
+        tempDir  = conf.getString("tempDir");
     }
 
     public <T extends Email> T prepareEmail(T email) throws EmailException {
@@ -52,6 +54,10 @@ public class MailConfig {
 
     public static HtmlEmail createHtmlEmail() throws EmailException {
         return INSTANCE.prepareEmail(new HtmlEmail());
+    }
+
+    public static String getTempDir() {
+        return INSTANCE.tempDir;
     }
 
     @Override
